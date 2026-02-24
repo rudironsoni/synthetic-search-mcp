@@ -32,7 +32,8 @@ var host = Host.CreateDefaultBuilder(args)
     // Configure HttpClient with default headers
     services.AddHttpClient("SyntheticSearch", client =>
     {
-      client.DefaultRequestHeaders.Add("X-API-Key", apiKey);
+      client.DefaultRequestHeaders.Authorization =
+        new AuthenticationHeaderValue("Bearer", apiKey);
       client.DefaultRequestHeaders.Accept.Add(
         new MediaTypeWithQualityHeaderValue("application/json"));
       client.Timeout = TimeSpan.FromSeconds(60);

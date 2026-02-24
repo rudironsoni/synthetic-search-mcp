@@ -10,7 +10,8 @@ RUN dotnet restore
 COPY . .
 RUN dotnet publish -c Release -o /app/publish \
   --no-restore \
-  --self-contained false
+  --self-contained false \
+  /p:UseSharedCompilation=false
 
 # Runtime image
 FROM mcr.microsoft.com/dotnet/runtime:10.0 AS runtime
