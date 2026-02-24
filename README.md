@@ -1,0 +1,221 @@
+# 🔍 Synthetic Search MCP Server
+
+[![.NET 10.0](https://img.shields.io/badge/.NET-10.0-512bd4)](https://dotnet.microsoft.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![MCP](https://img.shields.io/badge/MCP-Protocol-green)](https://modelcontextprotocol.io/)
+
+A zero-data-retention web search MCP server powered by [Synthetic.new](https://synthetic.new) for Claude Code, OpenCode, and other MCP-compatible clients.
+
+## ✨ Features
+
+- **Zero data retention** - searches aren't stored or logged
+- **Fast, reliable web search** for AI coding agents
+- **Multiple deployment options** - `dotnet run`, Docker, or .NET global tool
+- **Built with .NET 10** for performance and modern C# patterns
+- **Fully open source** (MIT License)
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- API key from [synthetic.new](https://synthetic.new)
+
+### 1. Clone and Build
+
+```bash
+git clone https://github.com/your-username/synthetic-search-mcp.git
+cd synthetic-search-mcp
+dotnet build
+```
+
+### 2. Configure Claude Desktop
+
+Add to your Claude Desktop configuration:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
+**Linux**: `~/.config/Claude/claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "synthetic-search": {
+      "command": "dotnet",
+      "args": ["run", "--project", "/path/to/synthetic-search-mcp"],
+      "env": {
+        "SYNTHETIC_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+### 3. Restart Claude
+
+The `synthetic_search` tool will now be available in Claude Code.
+
+## 📦 Installation Options
+
+### Option 1: Direct `dotnet run` (Development)
+
+```json
+{
+  "mcpServers": {
+    "synthetic-search": {
+      "command": "dotnet",
+      "args": ["run", "--project", "/path/to/synthetic-search-mcp"],
+      "env": {
+        "SYNTHETIC_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+### Option 2: Published Binary
+
+```bash
+dotnet publish -c Release -o /path/to/publish
+```
+
+```json
+{
+  "mcpServers": {
+    "synthetic-search": {
+      "command": "/path/to/publish/synthetic-search-mcp",
+      "env": {
+        "SYNTHETIC_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+### Option 3: Docker
+
+```bash
+docker build -t synthetic-search-mcp .
+```
+
+```json
+{
+  "mcpServers": {
+    "synthetic-search": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "-e", "SYNTHETIC_API_KEY", "synthetic-search-mcp"],
+      "env": {
+        "SYNTHETIC_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+### Option 4: .NET Global Tool (Future)
+
+```bash
+dotnet tool install -g SyntheticSearch.McpServer
+```
+
+```json
+{
+  "mcpServers": {
+    "synthetic-search": {
+      "command": "synthetic-search-mcp",
+      "env": {
+        "SYNTHETIC_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+## 🔧 Tool Reference
+
+### `synthetic_search`
+
+Search the web using Synthetic.new API.
+
+**Input:**
+```json
+{
+  "query": "string (required) - The search query to execute"
+}
+```
+
+**Output:**
+```json
+{
+  "query": "the original query",
+  "results": [
+    {
+      "title": "Result title",
+      "url": "https://example.com",
+      "snippet": "Search result snippet..."
+    }
+  ],
+  "resultCount": 10
+}
+```
+
+**Example Usage in Claude:**
+```
+Search for the latest .NET 10 features using synthetic_search.
+```
+
+## 🛠️ Development
+
+### Build
+
+```bash
+dotnet build
+```
+
+### Run Tests
+
+```bash
+dotnet test
+```
+
+### Test MCP Protocol Manually
+
+```bash
+# Start the server
+SYNTHETIC_API_KEY=your-key dotnet run
+
+# In another terminal, send a JSON-RPC request
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | dotnet run --project /path/to/synthetic-search-mcp
+```
+
+## 📋 Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SYNTHETIC_API_KEY` | Yes | Your API key from synthetic.new |
+| `DOTNET_ENVIRONMENT` | No | Set to `Development` for verbose logging |
+
+## 🔒 Security
+
+- API keys are read from environment variables only
+- No data persistence - searches are not stored
+- Logging goes to stderr to avoid interfering with JSON-RPC over stdout
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 🙏 Acknowledgments
+
+- [Synthetic.new](https://synthetic.new) for the zero-data-retention search API
+- [Model Context Protocol](https://modelcontextprotocol.io/) for the MCP specification
