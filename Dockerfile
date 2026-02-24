@@ -20,7 +20,7 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Create non-root user for security
-RUN adduser --disabled-password --gecos "" mcp
+RUN useradd -m -s /bin/bash mcp
 USER mcp
 
 # Set entrypoint
