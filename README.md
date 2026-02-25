@@ -204,17 +204,16 @@ This repository includes GitHub Actions workflows for production delivery:
 2. Create and push a version tag:
 
 ```bash
-git tag v1.4.2
-git push origin v1.4.2
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
 3. GitHub Actions builds and publishes images automatically
 
 ### Required GitHub Secrets
 
-Configure these repository secrets before using the CD workflow:
+Configure this repository secret before using the CD workflow:
 
-- `DOCKERHUB_USERNAME`
 - `DOCKERHUB_TOKEN`
 
 ### Test MCP Protocol Manually
