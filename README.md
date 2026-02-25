@@ -175,8 +175,47 @@ dotnet build
 ### Run Tests
 
 ```bash
-dotnet test
+dotnet test tests/SyntheticSearchMcp.Tests/SyntheticSearchMcp.Tests.csproj
 ```
+
+## 🔁 CI/CD and Release
+
+This repository includes GitHub Actions workflows for production delivery:
+
+- **CI** (`.github/workflows/ci.yml`)
+  - Runs on pull requests and pushes to `main`
+  - Restores dependencies
+  - Builds the project in `Release`
+  - Runs unit tests
+  - Builds Docker image and runs MCP handshake smoke tests
+
+- **CD** (`.github/workflows/cd-images.yml`)
+  - Runs on stable semver tags only: `vX.Y.Z`
+  - Publishes multi-arch Docker images (`linux/amd64`, `linux/arm64`) to:
+    - `ghcr.io/rudironsoni/synthetic-search-mcp`
+    - `docker.io/ronsonirudi/synthetic-search-mcp`
+  - Publishes exactly two tags per release:
+    - `latest`
+    - `vX.Y.Z` (the git tag)
+
+### Release Process
+
+1. Merge changes into `main`
+2. Create and push a version tag:
+
+```bash
+git tag v1.4.2
+git push origin v1.4.2
+```
+
+3. GitHub Actions builds and publishes images automatically
+
+### Required GitHub Secrets
+
+Configure these repository secrets before using the CD workflow:
+
+- `DOCKERHUB_USERNAME`
+- `DOCKERHUB_TOKEN`
 
 ### Test MCP Protocol Manually
 

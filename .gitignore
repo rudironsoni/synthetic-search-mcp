@@ -1,0 +1,20 @@
+# Build outputs
+bin/
+obj/
+TestResults/
+
+# Local tool state
+.serena/
+
+# IDE files
+.vs/
+.vscode/
+*.suo
+*.user
+
+# OS files
+.DS_Store
+
+# NuGet artifacts
+*.nupkg
+*.snupkg

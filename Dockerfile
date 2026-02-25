@@ -14,15 +14,11 @@ RUN dotnet publish -c Release -o /app/publish \
   /p:UseSharedCompilation=false
 
 # Runtime image
-FROM mcr.microsoft.com/dotnet/runtime:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 # Copy published output
 COPY --from=build /app/publish .
-
-# Create non-root user for security
-RUN useradd -m -s /bin/bash mcp
-USER mcp
 
 # Set entrypoint
 ENTRYPOINT ["dotnet", "synthetic-search-mcp.dll"]

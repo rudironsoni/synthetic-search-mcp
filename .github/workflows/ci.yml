@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    name: Build, Test, and Docker Smoke Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore tests/SyntheticSearchMcp.Tests/SyntheticSearchMcp.Tests.csproj
+
+      - name: Build
+        run: dotnet build tests/SyntheticSearchMcp.Tests/SyntheticSearchMcp.Tests.csproj -c Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/SyntheticSearchMcp.Tests/SyntheticSearchMcp.Tests.csproj -c Release --no-build --no-restore
+
+      - name: Build Docker image
+        run: docker build -t synthetic-search-mcp:ci .
+
+      - name: Docker MCP handshake smoke test
+        shell: bash
+        run: |
+          INITIALIZE_REQUEST='{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"ci","version":"1.0.0"}}}'
+          TOOLS_LIST_REQUEST='{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
+
+          RESPONSE="$(
+            (
+              echo "${INITIALIZE_REQUEST}"
+              sleep 1
+              echo "${TOOLS_LIST_REQUEST}"
+              sleep 1
+            ) | timeout 20 docker run -i --rm -e SYNTHETIC_API_KEY="ci-test-key" synthetic-search-mcp:ci
+          )"
+
+          echo "${RESPONSE}"
+
+          if [[ "${RESPONSE}" != *'"id":1'* ]]; then
+            echo "Initialize response not found"
+            exit 1
+          fi
+
+          if [[ "${RESPONSE}" != *'"name":"synthetic_search"'* ]]; then
+            echo "tools/list response did not include synthetic_search"
+            exit 1
+          fi
