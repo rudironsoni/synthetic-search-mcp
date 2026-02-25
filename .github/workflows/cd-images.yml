@@ -4,6 +4,17 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: "Release version tag to publish (vX.Y.Z)"
+        required: true
+        type: string
+      source_ref:
+        description: "Git ref to build from (branch, tag, or SHA)"
+        required: false
+        default: "main"
+        type: string
 
 permissions:
   contents: read
@@ -24,6 +35,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.source_ref || github.ref }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -33,12 +46,18 @@ jobs:
       - name: Validate release tag
         shell: bash
         run: |
-          if [[ ! "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            VERSION_TAG="${{ inputs.version_tag }}"
+          else
+            VERSION_TAG="${GITHUB_REF_NAME}"
+          fi
+
+          if [[ ! "${VERSION_TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Only stable semver tags are allowed (vX.Y.Z)."
             exit 1
           fi
 
-          echo "VERSION_TAG=${GITHUB_REF_NAME}" >> "${GITHUB_ENV}"
+          echo "VERSION_TAG=${VERSION_TAG}" >> "${GITHUB_ENV}"
 
       - name: Restore
         run: dotnet restore tests/SyntheticSearchMcp.Tests/SyntheticSearchMcp.Tests.csproj

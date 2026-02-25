@@ -190,7 +190,7 @@ This repository includes GitHub Actions workflows for production delivery:
   - Builds Docker image and runs MCP handshake smoke tests
 
 - **CD** (`.github/workflows/cd-images.yml`)
-  - Runs on stable semver tags only: `vX.Y.Z`
+  - Runs on stable semver tag pushes (`vX.Y.Z`) or manual workflow dispatch
   - Publishes multi-arch Docker images (`linux/amd64`, `linux/arm64`) to:
     - `ghcr.io/rudironsoni/synthetic-search-mcp`
     - `docker.io/ronsonirudi/synthetic-search-mcp`
@@ -209,6 +209,13 @@ git push origin v1.0.0
 ```
 
 3. GitHub Actions builds and publishes images automatically
+
+### Manual CD Trigger
+
+If needed, you can trigger `CD - Publish Images` manually from the GitHub Actions UI:
+
+- `version_tag`: required semver value, e.g. `v1.0.0`
+- `source_ref`: optional git ref to build from (default: `main`)
 
 ### Required GitHub Secrets
 
